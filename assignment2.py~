@@ -1,0 +1,51 @@
+#!/usr/bin/python
+__author__ = 'Athanasios Garyfalos'
+
+import re
+import sys
+import argparse
+
+def checkArgumentInput( argumentInputList  ):
+
+    if len(argumentInputList) != 4:
+        print '\nUsage: %s [filename: {}] [pattern: {}] [filename: {}]\n' . format( sys.argv[1],
+                                                                                    sys.argv[2],
+                                                                                    sys.argv[3] )
+        sys.exit(1)
+    elif '-h' in str(argumentInputList[1]):
+        parser = argparse.ArgumentParser( prog        = 'assignment1.py',
+                                          usage       = '%(prog)s [input file]',
+                                          description = 'Process ASCII File',
+                                          epilog      = 'Display the contents of a given ASCII file.' )
+        parser.add_argument( 'inFileName',
+                             type  = argparse.FileType('r'),
+                             help  = "ASCII file to be processed." )
+        args = parser.parse_args()
+    elif '.txt' not in str(argumentInputList[1]):
+        print '\nPlease use a source file with the ".txt" extension: %s\n' % str(sys.argv[1])
+        sys.exit(1)
+    elif '.txt' not in str(argumentInputList[3]):
+        print '\nPlease use a destination file with the ".txt" extension: %s\n' % str(sys.argv[3])
+        sys.exit(1)
+    return
+
+def processInputAsciiFile( asciiSourceFile, asciiDestinationFile ):
+    listOfLines = []
+    with open(asciiSourceFile, 'r') as fr:
+        with open(asciiDestinationFile, 'w') as fw:
+            for line in fr:
+                if re.search(sys.argv[2], line):
+                    fw.write(line)
+                    listOfLines.append(line)
+                    line = line.rstrip('\r\n')
+                    print line
+        fw.closed
+    fr.closed
+    return listOfLines
+
+def main():
+    checkArgumentInput( sys.argv )
+    print(processInputAsciiFile( sys.argv[1], sys.argv[3] ))
+
+main()
+sys.exit(0)
