@@ -46,9 +46,8 @@ def initialization( clientSocket, userNickname ) :
 
     if 'Hello version' not in data :
         print 'User connection is terminated, Server is not configured for this client!\n'
-        clientSocket.shutdown(SHUT_RDWR)
         clientSocket.close()
-        sys.exit()
+        sys.exit(1)
     else :
         clientSocket.send('NICK ' + userNickname)
         data = ''
@@ -57,9 +56,8 @@ def initialization( clientSocket, userNickname ) :
 
         if 'ERROR' in data :
             print data
-            clientSocket.shutdown(SHUT_RDWR)
             clientSocket.close()
-            sys.exit()
+            sys.exit(1)
         else :
             return
 
@@ -80,7 +78,7 @@ if __name__ == "__main__":
         s.connect((host, port))
     except :
         print 'Unable to connect'
-        sys.exit()
+        sys.exit(1)
 
     initialization(s, nickName)
     print 'Connected to remote host. Start sending messages'
@@ -90,7 +88,9 @@ if __name__ == "__main__":
         socket_list = [sys.stdin, s]
 
         # Get the list sockets which are readable
-        read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
+        read_sockets, write_sockets, error_sockets = select.select( socket_list,
+                                                                    [],
+                                                                    [] )
 
         for sock in read_sockets:
             #incoming message from remote server
@@ -100,6 +100,9 @@ if __name__ == "__main__":
                 if not data :
                     print '\nDisconnected from chat server'
                     sys.exit()
+                elif 'ERROR' in data:
+                    print data
+                    sys.exit(1)
                 else :
                     print data
                     #sys.stdout.write(data)
@@ -111,6 +114,13 @@ if __name__ == "__main__":
                 if msg.isspace() :
                     print 'Please enter a string not empty.'
                     prompt()
+                elif 'exit' in msg or \
+                     'quit' in msg :
+                    print 'Client requested to shutdown, GoodBye!'
+                    msg = 'MSG ' + msg
+                    s.send(msg)
+                    s.close()
+                    sys.exit(0)
                 else :
                     msg = 'MSG ' + msg
                     s.send(msg)

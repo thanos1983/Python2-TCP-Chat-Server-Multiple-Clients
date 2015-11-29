@@ -96,7 +96,9 @@ if __name__ == "__main__" :
 
     while 1 :
         # Get the list sockets which are ready to be read through select
-        read_sockets,write_sockets,error_sockets = select.select(CONNECTION_LIST,[],[])
+        read_sockets,write_sockets,error_sockets = select.select( CONNECTION_LIST,
+                                                                  [],
+                                                                  [] )
 
         for sock in read_sockets :
             #New connection
@@ -121,6 +123,20 @@ if __name__ == "__main__" :
                     broadcastingHost, broadcastingSocket = sock.getpeername()
                     if len(data) > MAX_BUFFER_RCV :
                         sock.send('ERROR please send less than 256 characters!\n')
+                    elif 'MSG' not in data :
+                        sock.send('ERROR the received text is not correctly fomatted e.g. "MSG nick txt"\n')
+                        # Clossing binded port client with server due to ERROR
+                        # Removing socket from list in future broadcast
+                        sock.close()
+                        CONNECTION_LIST.remove(sock)
+                        del dictionary[broadcastingSocket]
+                    elif 'exit' in data or \
+                         'quit' in data :
+                        # Clossing binded port client with server due to client
+                        # request. Removing socket from list in future broadcast
+                        sock.close()
+                        CONNECTION_LIST.remove(sock)
+                        del dictionary[broadcastingSocket]
                     else :
                         data + '\n'
                         broadcast_data(sock, "\r" + "<" + "MSG " + dictionary[broadcastingSocket] + "> " + data)
@@ -133,11 +149,4 @@ if __name__ == "__main__" :
                     continue
 
     server_socket.close()
-
-    '''
-            if 'MSG' not in data :
-                serverSocket.send('ERROR : MSG was not included please check again\n')
-                return
-            else :
-                return clientNickname
-    '''
+    sys.exit(0)
