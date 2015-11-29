@@ -9,20 +9,20 @@ BUFFER_RCV = 256
 def checkArgumentInput( argumentInputList  ):
 
     if len( argumentInputList ) != 3 :
-        print 'Usage : python {} hostname:port nickname' .format(argumentInputList[0])
+        print 'Usage : python {} [IP:PORT] [NickName]' .format(argumentInputList[0])
         sys.exit(1)
     elif ":" not in argumentInputList[1] :
-        print 'Usage : hostname:port nickname ({})' .format(argumentInputList[1])
+        print 'Usage : [IP:PORT] [NickName] ({})' .format(argumentInputList[1])
         sys.exit(1)
     elif argumentInputList[1].count(':') > 1 :
-        print 'Usage : hostname:port nickname ({})' .format(argumentInputList[1])
+        print 'Usage : [IP:PORT] [NickName] ({})' .format(argumentInputList[1])
         sys.exit(1)
 
     hostnameAndPort = argumentInputList[1].split(":")
 
     if not hostnameAndPort[0] or \
        not hostnameAndPort[1] :
-        print 'Usage : python {} hostname:port' .format(argumentInputList[0])
+        print 'Usage : python {} [IP:PORT]' .format(argumentInputList[0])
         sys.exit(1)
 
     if not hostnameAndPort[1].isdigit() or \
