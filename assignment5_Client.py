@@ -1,38 +1,10 @@
 #!/usr/bin/python
 __author__ = 'Athanasios Garyfalos'
 
-# TCP chat Client
-import socket, select, sys
-
-def prompt(userNickname) :
-    sys.stdout.write(userNickname + ': ')
-    sys.stdout.flush()
-    return
-
-def initialization( clientSocket, userNickname ) :
-
-    data = clientSocket.recv(256)
-    data = data.rstrip('\r\n')
-
-    if 'Hello version' not in data :
-        print 'User connection is terminated, Server is not configured for this client!\n'
-        clientSocket.shutdown(SHUT_RDWR)
-        clientSocket.close()
-        sys.exit()
-    else :
-        clientSocket.send('NICK ' + userNickname)
-
-        data = ''
-        data = clientSocket.recv(256)
-        data = data.rstrip('\r\n')
-
-        if 'ERROR' in data :
-            print data
-            clientSocket.shutdown(SHUT_RDWR)
-            clientSocket.close()
-            sys.exit()
-        else :
-            return
+# telnet program example
+import re
+import socket, select, string, sys
+BUFFER_RCV = 256
 
 def checkArgumentInput( argumentInputList  ):
 
@@ -40,10 +12,10 @@ def checkArgumentInput( argumentInputList  ):
         print 'Usage : python {} hostname:port nickname' .format(argumentInputList[0])
         sys.exit(1)
     elif ":" not in argumentInputList[1] :
-        print 'Usage : hostname:port ({}) nickname' .format(argumentInputList[1])
+        print 'Usage : hostname:port nickname ({})' .format(argumentInputList[1])
         sys.exit(1)
     elif argumentInputList[1].count(':') > 1 :
-        print 'Usage : hostname:port ({}) nickname' .format(argumentInputList[1])
+        print 'Usage : hostname:port nickname ({})' .format(argumentInputList[1])
         sys.exit(1)
 
     hostnameAndPort = argumentInputList[1].split(":")
@@ -67,18 +39,41 @@ def checkArgumentInput( argumentInputList  ):
 
     return (hostnameAndPort[0], int(hostnameAndPort[1]), argumentInputList[2])
 
+def initialization( clientSocket, userNickname ) :
+
+    data = clientSocket.recv(BUFFER_RCV)
+    data = data.rstrip('\r\n')
+
+    if 'Hello version' not in data :
+        print 'User connection is terminated, Server is not configured for this client!\n'
+        clientSocket.shutdown(SHUT_RDWR)
+        clientSocket.close()
+        sys.exit()
+    else :
+        clientSocket.send('NICK ' + userNickname)
+        data = ''
+        data = clientSocket.recv(BUFFER_RCV)
+        data = data.rstrip('\r\n')
+
+        if 'ERROR' in data :
+            print data
+            clientSocket.shutdown(SHUT_RDWR)
+            clientSocket.close()
+            sys.exit()
+        else :
+            return
+
+def prompt() :
+    sys.stdout.write('<You> ')
+    sys.stdout.flush()
+
 #main function
 if __name__ == "__main__":
 
     host, port, nickName = checkArgumentInput( sys.argv )
 
-    #create an INET, STREAMing socket
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(2)
-    except socket.error:
-        print 'Failed to create socket'
-        sys.exit()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(10)
 
     # connect to remote host
     try :
@@ -87,37 +82,36 @@ if __name__ == "__main__":
         print 'Unable to connect'
         sys.exit()
 
-    print 'Connected to remote host. Start sending messages'
     initialization(s, nickName)
-    prompt(nickName)
+    print 'Connected to remote host. Start sending messages'
+    prompt()
 
     while 1:
         socket_list = [sys.stdin, s]
 
         # Get the list sockets which are readable
-        read_sockets, write_sockets, error_sockets = select.select( socket_list ,
-                                                                    [] ,
-                                                                    [] )
+        read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
 
         for sock in read_sockets:
             #incoming message from remote server
             if sock == s:
-                data = ''
-                data = sock.recv(256)
-                if 'ERROR' in data :
-                    print data
-                    sock.shutdown(SHUT_RDWR)
-                    sock.close()
+                data = sock.recv(BUFFER_RCV)
+                data = data.rstrip('\r\n')
+                if not data :
+                    print '\nDisconnected from chat server'
                     sys.exit()
                 else :
-                    data = data.rstrip('\r\n')
-                    print
                     print data
-                    prompt(nickName)
+                    #sys.stdout.write(data)
+                    prompt()
 
             #user entered a message
             else :
                 msg = sys.stdin.readline()
-                msg = 'MSG ' + msg
-                s.send(msg)
-                #prompt(nickName)
+                if msg.isspace() :
+                    print 'Please enter a string not empty.'
+                    prompt()
+                else :
+                    msg = 'MSG ' + msg
+                    s.send(msg)
+                    prompt()
