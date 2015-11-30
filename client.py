@@ -9,32 +9,38 @@ BUFFER_RCV = 256
 def checkArgumentInput( argumentInputList  ):
 
     if len( argumentInputList ) != 3 :
-        print 'Usage : python {} [IP:PORT] [NickName]' .format(argumentInputList[0])
+        sys.stdout.write('Usage : python {} [IP:PORT] [NickName]\n' .format(argumentInputList[0]))
+        sys.stdout.flush()
         sys.exit(1)
     elif ":" not in argumentInputList[1] :
-        print 'Usage : [IP:PORT] [NickName] ({})' .format(argumentInputList[1])
+        sys.stdout.write('Usage : python {} [IP:PORT] please a column\n' .format(argumentInputList[0]))
+        sys.stdout.flush()
         sys.exit(1)
     elif argumentInputList[1].count(':') > 1 :
-        print 'Usage : [IP:PORT] [NickName] ({})' .format(argumentInputList[1])
+        sys.stdout.write('Usage : python {} [IP:PORT] please one column\n' .format(argumentInputList[0]))
+        sys.stdout.flush()
         sys.exit(1)
 
     hostnameAndPort = argumentInputList[1].split(":")
 
     if not hostnameAndPort[0] or \
        not hostnameAndPort[1] :
-        print 'Usage : python {} [IP:PORT]' .format(argumentInputList[0])
+        sys.stdout.write('Usage : python {} [IP:PORT]\n' .format(argumentInputList[0]))
+        sys.stdout.flush()
         sys.exit(1)
 
     if not hostnameAndPort[1].isdigit() or \
        int(hostnameAndPort[1]) < 0 or \
        int(hostnameAndPort[1]) > 65535 :
-        print 'Please enter a valid port number : ({})' .format(hostnameAndPort[1])
+        sys.stdout.write('Please use a valid port number "0 - 65535"\n' .format(argumentInputList[1]))
+        sys.stdout.flush()
         sys.exit(1)
 
     try:
         socket.inet_aton(hostnameAndPort[0])
     except socket.error:
-        print 'Please use a valid IP syntax: {}' .format(hostnameAndPort[0])
+        sys.stdout.write('Please use a valid IP syntax: {}' .format(hostnameAndPort[0]))
+        sys.stdout.flush()
         sys.exit(1)
 
     return (hostnameAndPort[0], int(hostnameAndPort[1]), argumentInputList[2])
@@ -45,7 +51,8 @@ def initialization( clientSocket, userNickname ) :
     data = data.rstrip('\r\n')
 
     if 'Hello version' not in data :
-        print 'User connection is terminated, Server is not configured for this client!\n'
+        sys.stdout.write('User connection is terminated, Server is not configured for this client!\n')
+        sys.stdout.flush()
         clientSocket.close()
         sys.exit(1)
     else :
@@ -55,7 +62,8 @@ def initialization( clientSocket, userNickname ) :
         data = data.rstrip('\r\n')
 
         if 'ERROR' in data :
-            print data
+            sys.stdout.write(data + '\n')
+            sys.stdout.flush()
             clientSocket.close()
             sys.exit(1)
         else :
@@ -77,11 +85,13 @@ if __name__ == "__main__":
     try :
         s.connect((host, port))
     except :
-        print 'Unable to connect'
+        sys.stdout.write('Unable to connect\n')
+        sys.stdout.flush()
         sys.exit(1)
 
     initialization(s, nickName)
-    print 'Connected to remote host. Start sending messages'
+    sys.stdout.write('Connected to remote host. Start sending messages\n')
+    sys.stdout.flush()
     prompt()
 
     while 1:
@@ -98,30 +108,35 @@ if __name__ == "__main__":
                 data = sock.recv(BUFFER_RCV)
                 data = data.rstrip('\r\n')
                 if not data :
-                    print '\nDisconnected from chat server'
+                    sys.stdout.write('\nDisconnected from chat server\n')
+                    sys.stdout.flush()
                     sys.exit()
                 elif 'ERROR' in data:
-                    print data
+                    sys.stdout.write(data)
+                    sys.stdout.flush()
                     sys.exit(1)
                 else :
-                    print data
-                    #sys.stdout.write(data)
+                    sys.stdout.write(data + '\n')
+                    sys.stdout.flush()
                     prompt()
 
             #user entered a message
             else :
                 msg = sys.stdin.readline()
+                msg = msg.rstrip('\r\n')
                 if msg.isspace() :
-                    print 'Please enter a string not empty.'
+                    sys.stdout.write('Please enter a string not empty.\n')
+                    sys.stdout.flush()
                     prompt()
                 elif 'exit' in msg or \
                      'quit' in msg :
-                    print 'Client requested to shutdown, GoodBye!'
+                    sys.stdout.write('Client requested to shutdown, GoodBye!\n')
+                    sys.stdout.flush()
                     msg = 'MSG ' + msg
                     s.send(msg)
                     s.close()
                     sys.exit(0)
                 else :
-                    msg = 'MSG ' + msg
+                    msg = 'MSG ' + msg + '\n'
                     s.send(msg)
                     prompt()

@@ -138,9 +138,11 @@ if __name__ == "__main__" :
                         CONNECTION_LIST.remove(sock)
                         del dictionary[broadcastingSocket]
                     else :
+                        tmp = []
+                        tmp = data.split(' ', 1)
+                        data = tmp[1]
                         data + '\n'
-                        broadcast_data(sock, "\r" + "<" + "MSG " + dictionary[broadcastingSocket] + "> " + data)
-
+                        broadcast_data(sock, "\r" + "<" + tmp[0] + " " + dictionary[broadcastingSocket] + "> " + data)
                 except :
                     broadcast_data(sock, "Client (%s, %s) is offline" % addr)
                     print "Client (%s, %s) is offline" % addr
