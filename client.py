@@ -111,11 +111,7 @@ if __name__ == "__main__":
             if sock == s:
                 data = sock.recv(BUFFER_RCV)
                 data = data.rstrip('\r\n')
-                if not data:
-                    sys.stdout.write('\nDisconnected from chat server\n')
-                    sys.stdout.flush()
-                    sys.exit()
-                elif 'ERROR' in data:
+                if 'ERROR' in data:
                     sys.stdout.write(data)
                     sys.stdout.flush()
                     sys.exit(1)
@@ -128,7 +124,7 @@ if __name__ == "__main__":
             else:
                 msg = sys.stdin.readline()
                 msg = msg.rstrip('\r\n')
-                if msg.isspace():
+                if len(msg) == 0:
                     sys.stdout.write('Please enter a string not empty.\n')
                     sys.stdout.flush()
                     prompt()
