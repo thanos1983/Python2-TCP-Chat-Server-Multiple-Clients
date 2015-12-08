@@ -23,13 +23,13 @@ def check_argument_input(argument_input_list):
     host_name_and_port = argument_input_list[1].split(":")
 
     if not host_name_and_port[0] or \
-       not host_name_and_port[1]:
+            not host_name_and_port[1]:
         print 'Usage : python {} [IP:PORT]' .format(argument_input_list[0])
         sys.exit(1)
 
     if not host_name_and_port[1].isdigit() or \
-       int(host_name_and_port[1]) < 0 or \
-       int(host_name_and_port[1]) > 65535:
+        int(host_name_and_port[1]) < 0 or \
+            int(host_name_and_port[1]) > 65535:
         print 'Please enter a valid port number : ({})' .format(host_name_and_port[1])
         sys.exit(1)
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
                 newUserNickname = initialization(socket_fd)
                 dictionary[address[1]] = newUserNickname
                 print "Client ({}, {}) connected" .format(address[0], address[1])
-                # Some incoming message from a client
+            # Some incoming message from a client
             else:
                 # Data received from client, process it
                 data = sock.recv(BUFFER_RCV)
@@ -126,7 +126,7 @@ if __name__ == "__main__":
                     CONNECTION_LIST.remove(sock)
                     del dictionary[broadcastingSocket]
                 elif 'exit' in data or \
-                     'quit' in data:
+                        'quit' in data:
                     # Closing bind port client with server due to client
                     # request. Removing socket from list in future broadcast
                     broadcast_data(sock,

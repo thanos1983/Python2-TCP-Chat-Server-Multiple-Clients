@@ -2,14 +2,26 @@
 import select
 import socket
 import sys
+import checkArgumentInput
 
 __author__ = 'Athanasios Garyfalos'
 
 # telnet program example
 BUFFER_RCV = 256
 
+argsValidation = checkArgumentInput.ArgumentLookupError(sys.argv)
 
-def check_argument_input(argument_input_list):
+if __name__ == '__main__':
+
+    try:
+        result = argsValidation.validate_argument_input(sys.argv)
+        print result
+    except ValueError as exception:
+        # handle exception here and get error message
+        print exception.message
+
+
+"""def check_argument_input(argument_input_list):
     if len(argument_input_list) != 3:
         sys.stdout.write('Usage : python {} [IP:PORT] [NickName]\n'.format(argument_input_list[0]))
         sys.stdout.flush()
@@ -26,14 +38,14 @@ def check_argument_input(argument_input_list):
     hostname_and_port = argument_input_list[1].split(":")
 
     if not hostname_and_port[0] or \
-       not hostname_and_port[1]:
+            not hostname_and_port[1]:
         sys.stdout.write('Usage : python {} [IP:PORT]\n'.format(argument_input_list[0]))
         sys.stdout.flush()
         sys.exit(1)
 
     if not hostname_and_port[1].isdigit() or \
-       int(hostname_and_port[1]) < 0 or \
-       int(hostname_and_port[1]) > 65535:
+            int(hostname_and_port[1]) < 0 or \
+            int(hostname_and_port[1]) > 65535:
         sys.stdout.write('Please use a valid port number "0 - 65535"\n'.format(argument_input_list[1]))
         sys.stdout.flush()
         sys.exit(1)
@@ -124,13 +136,12 @@ if __name__ == "__main__":
             else:
                 msg = sys.stdin.readline()
                 msg = msg.rstrip('\r\n')
-                if len(msg) == 0 or \
-                   msg.isspace():
+                if len(msg) == 0:
                     sys.stdout.write('Please enter a string not empty.\n')
                     sys.stdout.flush()
                     prompt()
                 elif 'exit' in msg or \
-                     'quit' in msg:
+                        'quit' in msg:
                     sys.stdout.write('Client requested to shutdown, GoodBye!\n')
                     sys.stdout.flush()
                     msg = 'MSG ' + msg
@@ -141,3 +152,4 @@ if __name__ == "__main__":
                     msg = 'MSG ' + msg + '\n'
                     s.send(msg)
                     prompt()
+                    """
