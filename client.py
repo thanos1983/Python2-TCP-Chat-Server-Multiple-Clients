@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 import select
 import socket
 import sys
@@ -9,58 +10,16 @@ __author__ = 'Athanasios Garyfalos'
 # telnet program example
 BUFFER_RCV = 256
 
-argsValidation = checkArgumentInput.ArgumentLookupError(sys.argv)
+argsValidation = checkArgumentInput.ArgumentLookupError()
 
 if __name__ == '__main__':
 
     try:
-        result = argsValidation.validate_argument_input(sys.argv)
-        print result
+        host, port, nickName = argsValidation.validate_argument_input(sys.argv)
     except ValueError as exception:
-        # handle exception here and get error message
         print exception.message
 
-
-"""def check_argument_input(argument_input_list):
-    if len(argument_input_list) != 3:
-        sys.stdout.write('Usage : python {} [IP:PORT] [NickName]\n'.format(argument_input_list[0]))
-        sys.stdout.flush()
-        sys.exit(1)
-    elif ":" not in argument_input_list[1]:
-        sys.stdout.write('Usage : python {} [IP:PORT] please a column\n'.format(argument_input_list[0]))
-        sys.stdout.flush()
-        sys.exit(1)
-    elif argument_input_list[1].count(':') > 1:
-        sys.stdout.write('Usage : python {} [IP:PORT] please one column\n'.format(argument_input_list[0]))
-        sys.stdout.flush()
-        sys.exit(1)
-
-    hostname_and_port = argument_input_list[1].split(":")
-
-    if not hostname_and_port[0] or \
-            not hostname_and_port[1]:
-        sys.stdout.write('Usage : python {} [IP:PORT]\n'.format(argument_input_list[0]))
-        sys.stdout.flush()
-        sys.exit(1)
-
-    if not hostname_and_port[1].isdigit() or \
-            int(hostname_and_port[1]) < 0 or \
-            int(hostname_and_port[1]) > 65535:
-        sys.stdout.write('Please use a valid port number "0 - 65535"\n'.format(argument_input_list[1]))
-        sys.stdout.flush()
-        sys.exit(1)
-
-    try:
-        socket.inet_aton(hostname_and_port[0])
-    except socket.error:
-        sys.stdout.write('Please use a valid IP syntax: {}'.format(hostname_and_port[0]))
-        sys.stdout.flush()
-        sys.exit(1)
-
-    return hostname_and_port[0], int(hostname_and_port[1]), argument_input_list[2]
-
-
-def initialization(client_socket, user_nickname):
+"""def initialization(client_socket, user_nickname):
     rcv_data = client_socket.recv(BUFFER_RCV)
     rcv_data = rcv_data.rstrip('\r\n')
 
