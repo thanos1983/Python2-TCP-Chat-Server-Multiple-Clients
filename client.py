@@ -10,16 +10,7 @@ __author__ = 'Athanasios Garyfalos'
 # telnet program example
 BUFFER_RCV = 256
 
-argsValidation = checkArgumentInput.ArgumentLookupError()
-
-if __name__ == '__main__':
-
-    try:
-        host, port, nickName = argsValidation.validate_argument_input(sys.argv)
-    except ValueError as exception:
-        print exception.message
-
-"""def initialization(client_socket, user_nickname):
+def initialization(client_socket, user_nickname):
     rcv_data = client_socket.recv(BUFFER_RCV)
     rcv_data = rcv_data.rstrip('\r\n')
 
@@ -48,9 +39,13 @@ def prompt():
 
 
 # main function
-if __name__ == "__main__":
+if __name__ == '__main__':
+    argsValidation = checkArgumentInput.ArgumentLookupError()
 
-    host, port, nickName = check_argument_input(sys.argv)
+    try:
+        host, port, nickName = argsValidation.validate_argument_input(sys.argv)
+    except ValueError as exception:
+        print exception.message
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(10)
@@ -111,4 +106,3 @@ if __name__ == "__main__":
                     msg = 'MSG ' + msg + '\n'
                     s.send(msg)
                     prompt()
-                    """
